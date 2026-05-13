@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Usage:
+#   ./tomp3-meeting.sh [--no-cut] [--denoise] [--track N] <input-video-or-audio>
+#
+# Output:
+#   <input_basename>.mp3
+
+cut_silence=1
+denoise=0
+track=0
+
+threshold="-35dB"
+min_silence="0.8"
+keep_silence="0.15"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+  --no-cut)
+    cut_silence=0
+    shift
+    ;;
+  --denoise)
+    denoise=1
+    shift
+    ;;
+  --track)
+    track="${2:?missing N}"
+    shift 2
+    ;;
+  -h | --help)
+    cat <<'EOF'
+Usage: tomp3-meeting.sh [--no-cut] [--denoise] [--track N] <input>
+Output: <input_basename>.mp3
+EOF
+    exit 0
+    ;;
+  --)
+    shift
+    break
+    ;;
+  -*)
+    echo "Error: Unknown option $1" >&2
+    exit 2
+    ;;
+  *) break ;;
+  esac
+done
+
+in="${1:?Usage: $0 [options] <input>}"
+out="${in%.*}.mp3"
+
+silence_af=""
+if [[ "$cut_silence" -eq 1 ]]; then
+  silence_af="silenceremove=\
+start_periods=1:start_duration=0.15:start_threshold=${threshold}:start_silence=0.05:\
+stop_periods=-1:stop_duration=${min_silence}:stop_threshold=${threshold}:stop_silence=${keep_silence}:\
+detection=rms:window=0.02"
+fi
+
+denoise_af=""
+if [[ "$denoise" -eq 1 ]]; then
+  denoise_af="afftdn=nr=8:nf=-35:tn=1,"
+fi
+
+core_af="aresample=async=1:first_pts=0,\
+aresample=16000:resampler=soxr:precision=20,\
+highpass=f=80,\
+${denoise_af}\
+acompressor=threshold=-24dB:ratio=3:attack=10:release=120:makeup=4,\
+alimiter=limit=0.97:attack=5:release=50,\
+loudnorm=I=-16:TP=-1.5:LRA=11,\
+lowpass=f=7500"
+
+if [[ -n "$silence_af" ]]; then
+  af="${silence_af},${core_af}"
+else
+  af="${core_af}"
+fi
+
+ffmpeg -hide_banner -y -i "$in" \
+  -vn -sn -dn \
+  -map 0:a:"$track" \
+  -filter:a "$af" \
+  -ac 1 -ar 16000 \
+  -c:a libmp3lame -b:a 64k -compression_level 2 \
+  "$out"
+
+echo "✅ Wrote: $out"

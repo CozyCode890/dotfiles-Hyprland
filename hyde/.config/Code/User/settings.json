@@ -1,0 +1,148 @@
+{
+    "window.commandCenter": false,
+    "workbench.layoutControl.enabled": false,
+    "window.menuStyle": "custom",
+    "window.menuBarVisibility": "compact",
+    "window.titleBarStyle": "native",
+    "window.customTitleBarVisibility": "never",
+    "workbench.sideBar.location": "right",
+    "editor.fontSize": 18,
+    "editor.lightbulb.enabled": "off",
+    "editor.lineHeight": 1.5,
+    "editor.smoothScrolling": true,
+    "editor.cursorSmoothCaretAnimation": "on",
+    "vim.easymotion": true,
+    "vim.incsearch": true,
+    "vim.useSystemClipboard": true,
+    "vim.useCtrlKeys": true,
+    "vim.hlsearch": true,
+    "vim.normalModeKeyBindingsNonRecursive": [
+        {
+            "before": [
+                "<Esc>"
+            ],
+            "commands": [
+                ":nohl"
+            ]
+        },
+        {
+            "before": [
+                "j"
+            ],
+            "after": [
+                "g",
+                "j"
+            ]
+        },
+        {
+            "before": [
+                "k"
+            ],
+            "after": [
+                "g",
+                "k"
+            ]
+        }
+    ],
+    "vim.visualModeKeyBindingsNonRecursive": [
+        {
+            "before": [
+                "j"
+            ],
+            "after": [
+                "g",
+                "j"
+            ]
+        },
+        {
+            "before": [
+                "k"
+            ],
+            "after": [
+                "g",
+                "k"
+            ]
+        }
+    ],
+    "extensions.experimental.affinity": {
+        "vscodevim.vim": 1
+    },
+    "editor.formatOnPaste": true,
+    "editor.codeLens": false,
+    "workbench.editor.showTabIndex": true,
+    "window.density.editorTabHeight": "compact",
+    "editor.minimap.enabled": false,
+    "editor.scrollbar.horizontal": "hidden",
+    "editor.scrollbar.vertical": "hidden",
+    "workbench.editor.titleScrollbarVisibility": "hidden",
+    "editor.lineNumbers": "relative",
+    "editor.scrollbar.horizontalScrollbarSize": 0,
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.tree.indent": 16,
+    "material-icon-theme.hidesExplorerArrows": true,
+    "security.workspace.trust.startupPrompt": "never",
+    "workbench.startupEditor": "none",
+    "workbench.tips.enabled": false,
+    "editor.stickyScroll.enabled": false,
+    "workbench.tree.enableStickyScroll": false,
+    "workbench.tree.renderIndentGuides": "none",
+    "explorer.confirmDragAndDrop": false,
+    "explorer.decorations.badges": false,
+    "git.decorations.enabled": false,
+    "editor.fontLigatures": true,
+    "errorLens.messageBackgroundMode": "message",
+    "errorLens.problemRangeDecorationEnabled": true,
+    "workbench.colorCustomizations": {
+        "editorCursor.background": "#000000",
+        "editorOverviewRuler.wordHighlightStrongForeground": "#0000",
+        "editorOverviewRuler.selectionHighlightForeground": "#0000",
+        "editorOverviewRuler.rangeHighlightForeground": "#0000",
+        "editorOverviewRuler.wordHighlightForeground": "#0000",
+        "editorOverviewRuler.bracketMatchForeground": "#0000",
+        "editorOverviewRuler.findMatchForeground": "#0000",
+        "editorOverviewRuler.modifiedForeground": "#0000",
+        "editorOverviewRuler.deletedForeground": "#0000",
+        "editorOverviewRuler.warningForeground": "#0000",
+        "editorOverviewRuler.addedForeground": "#0000",
+        "editorOverviewRuler.errorForeground": "#0000",
+        "editorOverviewRuler.infoForeground": "#0000",
+        "editorOverviewRuler.border": "#0000",
+        // "editorError.foreground": "#ff000088",
+        // "editorWarning.foreground": "#ffe60033",
+        // "editorInfo.foreground": "#00ff0088"
+    },
+    "scm.diffDecorations": "none",
+    "editor.guides.indentation": false,
+    "editor.renderWhitespace": "none",
+    "editor.overviewRulerBorder": false,
+    "editor.quickSuggestions": {
+        "strings": "on"
+    },
+    "files.autoSave": "afterDelay",
+    "editor.scrollbar.verticalScrollbarSize": 0,
+    "editor.suggest.showInlineDetails": false,
+    "editor.hover.enabled": "off",
+    "editor.parameterHints.enabled": false,
+    "explorer.confirmDelete": false,
+    "security.workspace.trust.enabled": false,
+    "code-runner.showExecutionMessage": false,
+    "terminal.external.linuxExec": "kitty",
+    "editor.wordWrap": "on",
+    "editor.fontFamily": "'CaskaydiaCove Nerd Font Mono', 'Droid Sans Mono', monospace",
+    "editor.formatOnSave": true,
+    "files.trimFinalNewlines": true,
+    "errorLens.messageEnabled": true,
+    "errorLens.enabledDiagnosticLevels": [
+        "error"
+    ],
+    "notebook.formatOnSave.enabled": true,
+    "notebook.output.textLineLimit": 20000,
+    "notebook.cellToolbarLocation": {
+        "default": "right",
+        "jupyter-notebook": "left"
+    },
+    "breadcrumbs.enabled": false,
+    "editor.cursorBlinking": "solid",
+    "workbench.colorTheme": "Forest Night - Ethereal",
+    "chat.disableAIFeatures": true
+}

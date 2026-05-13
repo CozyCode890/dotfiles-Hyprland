@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Usage:
+#   ./towav.sh [--no-cut] [--denoise] [--track N] [--threshold -35dB] [--min-silence 0.8] [--keep 0.15] <input>
+#
+# Output:
+#   <input_basename>.wav
+#
+# Transcript-friendly defaults:
+# - cut long silences (default ON) to speed up transcription
+# - mono, 16 kHz, PCM S16LE WAV
+# - highpass + (optional) light denoise + compressor + limiter + loudnorm
+
+cut_silence=1
+denoise=0
+track=0
+
+threshold="-35dB"
+min_silence="0.8"   # seconds of silence required before removal
+keep_silence="0.15" # seconds of silence kept around cuts
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+  -h | --help)
+    cat <<'EOF'
+Usage: towav.sh [--no-cut] [--denoise] [--track N] [--threshold -35dB] [--min-silence 0.8] [--keep 0.15] <input>
+Output: <input_basename>.wav
+
+Options:
+  --no-cut              Don't remove silence (keeps original timing)
+  --denoise             Enable light FFT denoise (may add artifacts on some VoIP audio)
+  --track N             Pick audio stream index (0 = first audio track)
+  --threshold <dB>      Silence threshold, e.g. -35dB, -40dB
+  --min-silence <sec>   Minimum silence duration to remove (e.g. 0.6, 0.8, 1.2)
+  --keep <sec>          Keep this much silence around cuts (e.g. 0.10, 0.20)
+EOF
+    exit 0
+    ;;
+  --no-cut)
+    cut_silence=0
+    shift
+    ;;
+  --denoise)
+    denoise=1
+    shift
+    ;;
+  --track)
+    track="${2:?missing N}"
+    shift 2
+    ;;
+  --threshold)
+    threshold="${2:?missing dB}"
+    shift 2
+    ;;
+  --min-silence)
+    min_silence="${2:?missing seconds}"
+    shift 2
+    ;;
+  --keep)
+    keep_silence="${2:?missing seconds}"
+    shift 2
+    ;;
+  --)
+    shift
+    break
+    ;;
+  -*)
+    echo "Error: Unknown option $1" >&2
+    exit 2
+    ;;
+  *) break ;;
+  esac
+done
+
+in="${1:?Usage: $0 [options] <input>}"
+out="${in%.*}.wav"
+
+# Silence removal (optional)
+# stop_periods=-1 makes it restart, so it can remove silence in the middle too. :contentReference[oaicite:3]{index=3}
+silence_af=""
+if [[ "$cut_silence" -eq 1 ]]; then
+  silence_af="silenceremove=\
+start_periods=1:start_duration=0.15:start_threshold=${threshold}:start_silence=0.05:\
+stop_periods=-1:stop_duration=${min_silence}:stop_threshold=${threshold}:stop_silence=${keep_silence}:\
+detection=rms:window=0.02"
+fi
+
+# Light denoise (optional). afftdn supports noise reduction + tracking. :contentReference[oaicite:4]{index=4}
+denoise_af=""
+if [[ "$denoise" -eq 1 ]]; then
+  denoise_af="afftdn=nr=8:nf=-35:tn=1,"
+fi
+
+# Core chain:
+# loudnorm gives consistent loudness targets (I/TP/LRA). :contentReference[oaicite:5]{index=5}
+core_af="aresample=16000:resampler=soxr:precision=20,\
+highpass=f=80,\
+${denoise_af}\
+acompressor=threshold=-24dB:ratio=3:attack=10:release=120:makeup=4,\
+alimiter=limit=0.97:attack=5:release=50,\
+loudnorm=I=-16:TP=-1.5:LRA=11,\
+lowpass=f=7500"
+
+# Combine
+if [[ -n "$silence_af" ]]; then
+  af="${silence_af},${core_af}"
+else
+  af="${core_af}"
+fi
+
+# Screen-recording friendly:
+# -vn -sn -dn ignores video/subs/data
+# -map chooses audio track explicitly
+ffmpeg -hide_banner -y -i "$in" \
+  -vn -sn -dn \
+  -map 0:a:"$track" \
+  -filter:a "$af" \
+  -ac 1 -ar 16000 -c:a pcm_s16le \
+  "$out"
+
+echo "✅ Wrote: $out"

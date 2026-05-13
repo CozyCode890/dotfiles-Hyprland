@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -ne 2 ]]; then
+  echo "Usage: $0 <file.pdf> <a-b>"
+  exit 1
+fi
+
+in="$1"
+range="$2"
+
+# basic checks
+if [[ ! -f "$in" ]]; then
+  echo "Error: file not found: $in"
+  exit 1
+fi
+
+if [[ "${in##*.}" != "pdf" && "${in##*.}" != "PDF" ]]; then
+  echo "Error: input must be a .pdf file"
+  exit 1
+fi
+
+if ! [[ "$range" =~ ^[0-9]+-[0-9]+$ ]]; then
+  echo "Error: range must look like a-b (example: 3-10)"
+  exit 1
+fi
+
+a="${range%-*}"
+b="${range#*-}"
+
+if ((a < 1 || b < 1 || a > b)); then
+  echo "Error: invalid range: $range"
+  exit 1
+fi
+
+if ! command -v qpdf >/dev/null 2>&1; then
+  echo "Error: qpdf not found. Install it first:"
+  echo "  Arch:   sudo pacman -S qpdf"
+  echo "  Debian: sudo apt install qpdf"
+  exit 1
+fi
+
+base="$(basename "$in")"
+name="${base%.*}"
+out="${name}_${a}-${b}.pdf"
+
+qpdf "$in" --pages . "${a}-${b}" -- "$out"
+echo "Wrote: $out"

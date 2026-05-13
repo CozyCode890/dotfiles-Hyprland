@@ -1,0 +1,56 @@
+# ~/.config/yazi/yazi.toml
+[tasks]
+# Pick sane-but-large values; avoid 0 unless you really trust your files.
+image_bound = [12000, 12000] # or 0 for unlimited (risky)
+image_alloc = 268435456      # 256 MiB; try 536870912 (512 MiB) if needed
+
+[opener]
+open = [
+  { run = "xdg-open %s", desc = "Open", for = "linux" }
+]
+edit = [
+  { run = "nvim %s", block = true, for = "linux" }
+]
+
+[open]
+prepend_rules = [
+  { mime = "text/*", use = "edit" },
+  { url = "*.md", use = "edit" },
+  { url = "*.srt", use = "edit" },
+  { url = "*.json", use = "edit" },
+  { url = "*.yaml", use = "edit" },
+  { url = "*.yml", use = "edit" },
+  { url = "*.toml", use = "edit" },
+]
+
+[plugin]
+prepend_previewers = [
+  { name = "*.csv", run = "duckdb" },
+  { name = "*.tsv", run = "duckdb" },
+  { name = "*.json", run = "duckdb" },
+  { name = "*.parquet", run = "duckdb" },
+  { name = "*.txt", run = "duckdb" },
+  { name = "*.xlsx", run = "duckdb" },
+  { name = "*.db", run = "duckdb" },
+  { name = "*.duckdb", run = "duckdb" },
+]
+
+prepend_preloaders = [
+  { name = "*.csv", run = "duckdb", multi = false },
+  { name = "*.tsv", run = "duckdb", multi = false },
+  { name = "*.json", run = "duckdb", multi = false },
+  { name = "*.parquet", run = "duckdb", multi = false },
+  { name = "*.txt", run = "duckdb", multi = false },
+  { name = "*.xlsx", run = "duckdb", multi = false },
+]
+
+[mgr]
+sort_by = "natural"
+sort_reverse = false
+scrolloff = 5
+show_hidden = false
+linemode = "size"
+sort_dir_first = false
+
+[ui]
+transition = true

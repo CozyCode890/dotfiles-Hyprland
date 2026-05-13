@@ -1,0 +1,6 @@
+[soe][Limiter#0]
+gainBoost=false
+inputGain=-2
+oversampling=21
+release=10
+threshold=-1

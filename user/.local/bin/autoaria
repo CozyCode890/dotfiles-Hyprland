@@ -1,0 +1,20 @@
+url="$1"
+
+# quick bandwidth estimate (needs curl)
+# downloads ~8MiB (if server supports Range), times it, converts to Mbps
+mbps="$(curl -L --silent --output /dev/null \
+  -H "Range: bytes=0-8388607" \
+  -w "%{speed_download}" "$url" \
+  | awk '{printf "%.0f", ($1*8)/1000000 }')"
+
+# choose a conservative profile
+if [ "$mbps" -lt 10 ]; then
+  x=2; s=2; k=4M
+elif [ "$mbps" -lt 50 ]; then
+  x=4; s=4; k=2M
+else
+  x=8; s=8; k=1M
+fi
+
+echo "Detected ~${mbps} Mbps -> aria2c -x $x -s $s -k $k"
+aria2c -x "$x" -s "$s" -k "$k" -c "$url"
